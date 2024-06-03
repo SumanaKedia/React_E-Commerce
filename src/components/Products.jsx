@@ -11,6 +11,8 @@ const Products = () => {
   const [data, setData] = useState([]);
   const [filter, setFilter] = useState(data);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  // const [imageUrls, setImageUrls] = useState([]);//sumana
   let componentMounted = true;
 
   const dispatch = useDispatch();
@@ -22,12 +24,24 @@ const Products = () => {
   useEffect(() => {
     const getProducts = async () => {
       setLoading(true);
-      const response = await fetch("https://fakestoreapi.com/products/");
-      if (componentMounted) {
-        setData(await response.clone().json());
-        setFilter(await response.json());
+      // const response = await fetch("https://fakestoreapi.com/products/");Sumana Kedia
+      try {
+        const response = await fetch('https://7wd758pes5.execute-api.us-east-1.amazonaws.com/Prod/products/');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        if (componentMounted) {
+          setData(await response.clone().json());
+          // setImageUrls(data.image); //sumana
+          setFilter(await response.json());
+          setLoading(false);
+        }
+      } catch (error) {
+        setError(error.message);
         setLoading(false);
       }
+
+
 
       return () => {
         componentMounted = false;
@@ -83,12 +97,20 @@ const Products = () => {
         </div>
 
         {filter.map((product) => {
+          // Convert S3 URL to HTTP(S) URL
+          // Convert S3 URL to HTTP(S) URL
+          // function imageUrlToHttp(s3Url) {
+          //   // Replace 's3://' with 'https://s3.amazonaws.com/'
+          //   return s3Url.replace('s3://', 'https://s3.amazonaws.com/');
+          // }
           return (
             <div id={product.id} key={product.id} className="col-md-4 col-sm-6 col-xs-8 col-12 mb-4">
               <div className="card text-center h-100" key={product.id}>
                 <img
                   className="card-img-top p-3"
                   src={product.image}
+                  // src={imageUrlToHttp(product.image)}
+
                   alt="Card"
                   height={300}
                 />

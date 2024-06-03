@@ -14,6 +14,8 @@ const Product = () => {
   const [loading, setLoading] = useState(false);
   const [loading2, setLoading2] = useState(false);
 
+
+
   const dispatch = useDispatch();
 
   const addProduct = (product) => {
@@ -21,21 +23,56 @@ const Product = () => {
   };
 
   useEffect(() => {
-    const getProduct = async () => {
-      setLoading(true);
-      setLoading2(true);
-      const response = await fetch(`https://fakestoreapi.com/products/${id}`);
-      const data = await response.json();
-      setProduct(data);
-      setLoading(false);
-      const response2 = await fetch(
-        `https://fakestoreapi.com/products/category/${data.category}`
-      );
-      const data2 = await response2.json();
-      setSimilarProducts(data2);
-      setLoading2(false);
+    // changed by Sumana
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`https://7wd758pes5.execute-api.us-east-1.amazonaws.com/Stage/products/${id}`);
+
+        const data = await response.json();
+        console.log(data);
+        setLoading(false);
+        setProduct(data);
+
+      } catch (error) {
+        console.error('Error fetching product:', error);
+      }
     };
-    getProduct();
+
+    const fetchSimilarProducts = async () => {
+      try {
+        setLoading2(true);
+        const response2 = await fetch(
+          // `https://fakestoreapi.com/products/category/${data.category}`
+          `https://fakestoreapi.com/products/category/men's clothing`
+        );
+        const data2 = await response2.json();
+        setSimilarProducts(data2);
+        setLoading2(false);
+      } catch (error) {
+        console.error('Error fetching similar products:', error);
+      }
+    };
+
+    // const getProduct = async () => {
+    //   setLoading(true);
+    //   setLoading2(true);
+    //   // const response = await fetch(`https://fakestoreapi.com/products/${id}`); Sumana Kedia
+    //   const response = await fetch(`https://7wd758pes5.execute-api.us-east-1.amazonaws.com/Stage/products/${id}`);
+    //   const data = await response.json();
+    //   setProduct(data);
+    //   setLoading(false);
+    //   const response2 = await fetch(
+    //     // `https://fakestoreapi.com/products/category/${data.category}`
+    //     `https://fakestoreapi.com/products/category/men's clothing`
+    //   );
+    //   const data2 = await response2.json();
+    //   setSimilarProducts(data2);
+    //   setLoading2(false);};
+
+    fetchProduct();
+    fetchSimilarProducts();
+    // getProduct();
   }, [id]);
 
   const Loading = () => {
@@ -175,7 +212,7 @@ const Product = () => {
         <div className="row">{loading ? <Loading /> : <ShowProduct />}</div>
         <div className="row my-5 py-5">
           <div className="d-none d-md-block">
-          <h2 className="">You may also Like</h2>
+            <h2 className="">You may also Like</h2>
             <Marquee
               pauseOnHover={true}
               pauseOnClick={true}
