@@ -33,18 +33,20 @@ const Product = () => {
         console.log(data);
         setLoading(false);
         setProduct(data);
+        fetchSimilarProducts(data);
 
       } catch (error) {
         console.error('Error fetching product:', error);
       }
     };
 
-    const fetchSimilarProducts = async () => {
+    const fetchSimilarProducts = async (data) => {
       try {
         setLoading2(true);
+
         const response2 = await fetch(
           // `https://fakestoreapi.com/products/category/${data.category}`
-          `https://fakestoreapi.com/products/category/men's clothing`
+          `https://7wd758pes5.execute-api.us-east-1.amazonaws.com/Prod/products/category/${data.category}`
         );
         const data2 = await response2.json();
         setSimilarProducts(data2);
@@ -71,7 +73,7 @@ const Product = () => {
     //   setLoading2(false);};
 
     fetchProduct();
-    fetchSimilarProducts();
+
     // getProduct();
   }, [id]);
 
