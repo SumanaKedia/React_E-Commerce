@@ -1,11 +1,13 @@
+
 import React, { useEffect, useState } from "react";
 import Skeleton from "react-loading-skeleton";
 import { Link, useParams } from "react-router-dom";
 import Marquee from "react-fast-marquee";
 import { useDispatch } from "react-redux";
 import { addCart } from "../redux/action";
-
 import { Footer, Navbar } from "../components";
+import awsConfig from '../awsConfig';
+
 
 const Product = () => {
   const { id } = useParams();
@@ -13,8 +15,6 @@ const Product = () => {
   const [similarProducts, setSimilarProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loading2, setLoading2] = useState(false);
-
-
 
   const dispatch = useDispatch();
 
@@ -27,7 +27,14 @@ const Product = () => {
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`https://7wd758pes5.execute-api.us-east-1.amazonaws.com/Stage/products/${id}`);
+        const response = await fetch(`${awsConfig.product_baseurl}${id}`, {
+          headers: {
+            'x-api-key': awsConfig.apiKey
+          }
+        });
+        if (!response.ok) {
+          throw new Error(`Error fetching product: ${response.statusText}`);
+        }
 
         const data = await response.json();
         console.log(data);
@@ -38,16 +45,23 @@ const Product = () => {
       } catch (error) {
         console.error('Error fetching product:', error);
       }
+
     };
 
     const fetchSimilarProducts = async (data) => {
       try {
         setLoading2(true);
+        // `https://fakestoreapi.com/products/category/${data.category}`
+        const response2 = await fetch(`${awsConfig.product_baseurl}category/${data.category}`, {
+          headers: {
+            'x-api-key': awsConfig.apiKey
+          }
+        });
+        if (!response2.ok) {
+          throw new Error(`Error fetching product: ${response2.statusText}`);
+        }
 
-        const response2 = await fetch(
-          // `https://fakestoreapi.com/products/category/${data.category}`
-          `https://7wd758pes5.execute-api.us-east-1.amazonaws.com/Prod/products/category/${data.category}`
-        );
+
         const data2 = await response2.json();
         setSimilarProducts(data2);
         setLoading2(false);
@@ -215,3 +229,4 @@ const Product = () => {
 };
 
 export default Product;
+

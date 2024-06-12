@@ -1,11 +1,11 @@
+
 import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { addCart } from "../redux/action";
-
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-
 import { Link } from "react-router-dom";
+import awsConfig from '../awsConfig';
 
 const Products = () => {
   const [data, setData] = useState([]);
@@ -26,9 +26,15 @@ const Products = () => {
       setLoading(true);
       // const response = await fetch("https://fakestoreapi.com/products/");Sumana Kedia
       try {
-        const response = await fetch('https://7wd758pes5.execute-api.us-east-1.amazonaws.com/Prod/products/');
+
+
+        const response = await fetch(`${awsConfig.product_baseurl}`, {
+          headers: {
+            'x-api-key': awsConfig.apiKey
+          }
+        });
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+          throw new Error(`Error fetching product: ${response.statusText}`);
         }
         if (componentMounted) {
           setData(await response.clone().json());
@@ -40,9 +46,6 @@ const Products = () => {
         setError(error.message);
         setLoading(false);
       }
-
-
-
       return () => {
         componentMounted = false;
       };
@@ -161,3 +164,5 @@ const Products = () => {
 };
 
 export default Products;
+
+
