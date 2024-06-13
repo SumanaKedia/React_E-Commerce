@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import store from './redux/store';
-import { Home, Product, Products, AboutPage, ContactPage, Cart, Login, Register, Checkout, PageNotFound, OrderSuccess, OrderHistory, OrderDetails } from "./pages";
+import { Home, Product, Products, AboutPage, ContactPage, Cart, Login, Register, Checkout, PageNotFound, OrderSuccess, OrderHistory, OrderDetails, CompareProducts } from "./pages";
 import { AuthProvider } from './pages/AuthContext'; // Adjust the path of AuthProvider
 import ProtectedRoute from './pages/ProtectedRoute'; // Adjust the path of ProtectedRoute
 
@@ -25,6 +25,7 @@ const App = () => (
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/compare" element={<CompareProducts />} />
 
           <Route path="/cart"
             element={

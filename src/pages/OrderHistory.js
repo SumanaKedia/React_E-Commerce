@@ -5,6 +5,7 @@ import Footer from '../components/Footer';
 import { useAuth } from './AuthContext';
 import awsConfig from '../awsConfig';
 import { Link } from 'react-router-dom';
+import { getToken } from "./authService";
 
 const OrderHistory = () => {
     const [orders, setOrders] = useState([]);
@@ -15,6 +16,7 @@ const OrderHistory = () => {
     useEffect(() => {
         const fetchOrders = async () => {
             setLoading(true);
+            const token = await getToken();
             try {
                 if (!email) {
                     throw new Error("Email is not available");
@@ -23,7 +25,8 @@ const OrderHistory = () => {
                 const response = await fetch(`https://7wd758pes5.execute-api.us-east-1.amazonaws.com/Prod/getorderforcustomer?useremail=${encodeURIComponent(email)}`, {
                     headers: {
                         "Content-Type": "application/json",
-                        'x-api-key': awsConfig.apiKey
+                        'x-api-key': awsConfig.apiKey,
+                        "Authorization": token
                     }
                 });
 
@@ -65,7 +68,7 @@ const OrderHistory = () => {
                                         <strong>Order No:</strong> {order.orderID}
                                     </div>
                                     <div>
-                                        <strong>Total:</strong> £{order.totalAmount}
+                                        <strong>Total:</strong> ${order.totalAmount}
                                     </div>
                                 </div>
                                 <div className="card-body">
@@ -74,7 +77,7 @@ const OrderHistory = () => {
                                             <li key={index} className="d-flex align-items-center mb-2">
                                                 <img src={item.image} alt={item.title} className="img-thumbnail" style={{ width: '50px', height: '50px' }} />
                                                 <div className="ml-3">
-                                                    <strong>{item.title}</strong>
+                                                    {item.title}
                                                 </div>
                                             </li>
                                         ))}

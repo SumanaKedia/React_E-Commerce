@@ -7,6 +7,7 @@ export { default as Cart } from './Cart';
 export { default as Login } from './Login';
 export { default as Register } from './Register';
 export { default as Checkout } from './Checkout';
+export { default as CompareProducts } from './CompareProducts';
 export { default as OrderSuccess } from './OrderSuccess';
 export { default as OrderHistory } from './OrderHistory';
 export { default as OrderDetails } from './OrderDetails';

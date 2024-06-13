@@ -77,6 +77,9 @@ export const getToken = async () => {
     });
 };
 
+
+
+
 export const logout = async () => {
 
     const cognitoUser = userPool.getCurrentUser();

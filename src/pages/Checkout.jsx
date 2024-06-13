@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import OrderSuccess from "./OrderSuccess";
 import { clearCart } from "../redux/action";
+import { getToken } from "./authService";
 
 const Checkout = () => {
   const dispatch = useDispatch();
@@ -15,6 +16,7 @@ const Checkout = () => {
   const navigate = useNavigate();
   const [responseMessage, setResponseMessage] = useState("");
   // const { register, handleSubmit, reset } = useForm();
+
   const {
     register,
     handleSubmit,
@@ -26,11 +28,12 @@ const Checkout = () => {
     cartItems.reduce((total, item) => total + item.price * item.qty, 0) + 30;
 
   const onSubmit = async (formData) => {
+    const token = await getToken();
     const orderDetails = {
       useremail: formData.email,
       items: cartItems.map((item) => {
-        const ratingRate = item.rating?.rate ? item.rating.rate.toString() : "";
-        const ratingCount = item.rating?.count ? item.rating.count.toString() : "";
+        // const ratingRate = item.rating?.rate ? item.rating.rate.toString() : "";
+        // const ratingCount = item.rating?.count ? item.rating.count.toString() : "";
 
         return {
           id: item.id,
@@ -39,11 +42,11 @@ const Checkout = () => {
           image: item.image,
           price: String(Number(item.price)),  // Ensure price is a number
           qty: String(item.qty),
-          category: item.category,
-          rating: {
-            rate: ratingRate, // Ensuring rate is a string
-            count: ratingCount // Ensuring count is a string
-          },
+          // category: item.category,
+          // rating: {
+          //   rate: ratingRate, // Ensuring rate is a string
+          // count: ratingCount // Ensuring count is a string
+          // },
         };
       }),
 
@@ -55,12 +58,12 @@ const Checkout = () => {
         firstName: formData.firstName,
         lastName: formData.lastName,
         address: formData.address,
-        address2: formData.address2 || "",
+        // address2: formData.address2 || "",
         email: formData.email,
-        ccCVV: formData.ccCVV,
-        ccExpiration: formData.ccExpiration,
-        ccName: formData.ccName,
-        ccNumber: formData.ccNumber,
+        // ccCVV: formData.ccCVV,
+        // ccExpiration: formData.ccExpiration,
+        // ccName: formData.ccName,
+        // ccNumber: formData.ccNumber,
         country: formData.country,
         state: formData.state,
         zip: formData.zip,
@@ -74,7 +77,8 @@ const Checkout = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          'x-api-key': awsConfig.apiKey
+          'x-api-key': awsConfig.apiKey,
+          "Authorization": token
         },
         body: JSON.stringify(orderDetails),
       });
