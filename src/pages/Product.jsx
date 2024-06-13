@@ -3,6 +3,7 @@ import Skeleton from "react-loading-skeleton";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import Marquee from "react-fast-marquee";
 import { useDispatch } from "react-redux";
+// import { addCart } from "../redux/slices/cartSlice.js";
 import { addCart } from "../redux/action";
 import { Footer, Navbar } from "../components";
 import awsConfig from '../awsConfig';

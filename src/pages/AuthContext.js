@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useReducer, useEffect, useState } from 'react';
-import { login, register, confirmRegistration, getToken, logout } from './authService'; // Import the authService functions
+import { login, register, confirmRegistration, logout } from './authService'; // Import the authService functions
 import userPool from './CognitoUserPool';
 import { useDispatch } from "react-redux";
 import { clearCart } from "../redux/action";
@@ -152,5 +152,3 @@ export const AuthProvider = ({ children }) => {
 };
 
 export const useAuth = () => useContext(AuthContext);
-
-
