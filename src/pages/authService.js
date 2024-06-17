@@ -16,6 +16,7 @@ export const login = async (email, password) => {
     return new Promise((resolve, reject) => {
         cognitoUser.authenticateUser(authDetails, {
             onSuccess: (result) => {
+
                 const token = result.getIdToken().getJwtToken();
                 cognitoUser.getUserAttributes((err, attributes) => {
                     if (err) {
@@ -23,12 +24,21 @@ export const login = async (email, password) => {
                     } else {
                         const nameAttribute = attributes.find(attr => attr.Name === 'name');
                         const name = nameAttribute ? nameAttribute.Value : null;
-                        resolve({ email, name, token });
+                        const authenticated = true;
+                        resolve({ email, name, token, authenticated });
                     }
                 });
             },
             onFailure: (err) => {
-                reject(err);
+
+                if (err.code === 'UserNotFoundException') {
+                    reject('User not found.');
+                } else if (err.code === 'NotAuthorizedException') {
+                    reject('Incorrect username or password.');
+                } else {
+
+                    reject('Login failed. Please try again.');
+                }
             },
         });
     });

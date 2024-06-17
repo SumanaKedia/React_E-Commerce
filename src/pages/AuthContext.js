@@ -66,14 +66,45 @@ export const AuthProvider = ({ children }) => {
     const [state, dispatch] = useReducer(authReducer, initialState);
     const [userAttributes, setUserAttributes] = useState({});
 
+    // const loginHandler = async (email, password) => {
+    //     try {
+    //         const result = await login(email, password);
+    //         // Update user attributes after successful login
+    //         const cognitoUser = userPool.getCurrentUser();
+    //         cognitoUser.getUserAttributes((err, attributes) => {
+    //             if (err) throw err;
+    //             const attributesMap = attributes.reduce((map, attr) => {
+    //                 map[attr.Name] = attr.Value;
+    //                 return map;
+    //             }, {});
+    //             setUserAttributes(attributesMap);
+
+    //             dispatch({
+    //                 type: 'LOGIN_SUCCESS',
+    //                 payload: {
+    //                     email: attributesMap.email || result.email,
+    //                     name: attributesMap.name || result.name,
+    //                     token: result.token,
+    //                     authenticated: true,
+    //                 },
+    //             });
+    //         });
+    //     } catch (error) {
+    //         dispatch({ type: 'LOGIN_FAILURE', payload: { error: error.message } });
+    //     }
+    // };
+
     const loginHandler = async (email, password) => {
         try {
             const result = await login(email, password);
+
             dispatch({ type: 'LOGIN_SUCCESS', payload: result });
         } catch (error) {
+
             dispatch({ type: 'LOGIN_FAILURE', payload: { error: error.message } });
         }
     };
+
 
     const registerHandler = async (email, password, attributes) => {
         try {
@@ -97,12 +128,14 @@ export const AuthProvider = ({ children }) => {
     const logoutHandler = async () => {
         try {
             await logout();
-            dispatchcart(clearCart());
+            // dispatchcart(clearCart());
             dispatch({ type: 'LOGOUT' });
         } catch (error) {
             console.error("Logout Error: ", error.message);
         }
     };
+
+
 
     useEffect(() => {
         const initializeAuthState = async () => {
@@ -123,16 +156,17 @@ export const AuthProvider = ({ children }) => {
                             attributes.forEach(attr => {
                                 attributesMap[attr.Name] = attr.Value;
                             });
-
+                            setUserAttributes(attributesMap);
                             dispatch({
                                 type: 'LOGIN_SUCCESS',
                                 payload: {
                                     email: attributesMap.email || cognitoUser.getUsername(),
                                     name: attributesMap.name || null,
+                                    authenticated: true,
                                     token: session.getIdToken().getJwtToken(),
                                 },
                             });
-                            setUserAttributes(attributesMap);
+
                         });
                     });
                 }
@@ -144,6 +178,8 @@ export const AuthProvider = ({ children }) => {
         initializeAuthState();
     }, []); // Empty dependency array ensures this runs only once on mount
 
+
+
     return (
         <AuthContext.Provider value={{ ...state, userAttributes, login: loginHandler, logout: logoutHandler, register: registerHandler, confirmRegistration: confirmRegistrationHandler }}>
             {children}
@@ -152,3 +188,6 @@ export const AuthProvider = ({ children }) => {
 };
 
 export const useAuth = () => useContext(AuthContext);
+
+
+

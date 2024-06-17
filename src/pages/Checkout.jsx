@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import OrderSuccess from "./OrderSuccess";
 import { clearCart } from "../redux/action";
 import { getToken } from "./authService";
+import { useAuth } from '../pages/AuthContext';
 
 const Checkout = () => {
   const dispatch = useDispatch();
@@ -16,6 +17,8 @@ const Checkout = () => {
   const navigate = useNavigate();
   const [responseMessage, setResponseMessage] = useState("");
   // const { register, handleSubmit, reset } = useForm();
+  const { userAttributes } = useAuth();
+
 
   const {
     register,
@@ -30,7 +33,7 @@ const Checkout = () => {
   const onSubmit = async (formData) => {
     const token = await getToken();
     const orderDetails = {
-      useremail: formData.email,
+      useremail: userAttributes.email,
       items: cartItems.map((item) => {
         // const ratingRate = item.rating?.rate ? item.rating.rate.toString() : "";
         // const ratingCount = item.rating?.count ? item.rating.count.toString() : "";

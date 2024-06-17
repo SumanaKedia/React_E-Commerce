@@ -1,11 +1,14 @@
-import React from 'react';
+import React from "react";
 import { NavLink } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { useAuth } from '../pages/AuthContext';
 
 const Navbar = () => {
-    const state = useSelector(state => state.handleCart);
-    const { authenticated, name, logout } = useAuth();
+
+    const cartState = useSelector(state => state.handleCart);
+    const { authenticated, logout, name, email } = useAuth();
+    const stateOfwish = useSelector(state => state.wishlist);
+    const userWishlist = (stateOfwish.wishlists && stateOfwish.wishlists[email]) || [];
 
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light py-3 sticky-top">
@@ -38,23 +41,34 @@ const Navbar = () => {
                                     <i className="fa fa-history mr-1"></i> Order History
                                 </NavLink>
 
+                                <NavLink to="/wishlist" className="btn btn-outline-dark btn-sm m-2">
+                                    <i className="fa fa-heart mr-1"></i> Wishlist ({userWishlist.length})
+                                </NavLink>
                                 <button className="btn btn-outline-dark btn-sm m-2" onClick={logout}>
                                     <i className="fa fa-sign-out-alt mr-1"></i> Logout
                                 </button>
+
                             </>
                         ) : (
                             <>
-                                <NavLink to="/login" className="btn btn-outline-dark m-2">
+                                <NavLink to="/login" className="btn btn-outline-dark btn-sm m-2">
                                     <i className="fa fa-sign-in-alt mr-1"></i> Login
                                 </NavLink>
-                                <NavLink to="/register" className="btn btn-outline-dark m-2">
+                                <NavLink to="/register" className="btn btn-outline-dark btn-sm m-2">
                                     <i className="fa fa-user-plus mr-1"></i> Register
                                 </NavLink>
+
+
                             </>
                         )}
-                        <NavLink to="/cart" className="btn btn-outline-dark m-2">
-                            <i className="fa fa-cart-shopping mr-1"></i> Cart ({state.length})
+                        {/* <NavLink to="/cart" className="btn btn-outline-dark btn-sm m-2">
+                            <i className="fa fa-shopping-cart mr-1"></i> Cart ({cartState.length})
+                        </NavLink> */}
+                        <NavLink to="/cart" className="btn btn-outline-dark btn-sm m-2">
+                            <i className="fa fa-shopping-cart mr-1"></i>
+                            Cart ({authenticated ? cartState.length : 0})
                         </NavLink>
+
                     </div>
                 </div>
             </div>

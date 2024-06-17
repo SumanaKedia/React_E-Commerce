@@ -1,10 +1,13 @@
+
 import React, { useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { addCart } from "../redux/action";
+import { useDispatch, useSelector } from "react-redux";
+import { addCart, addWishlistItem, removeWishlistItem } from "../redux/action/index";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { Link, useNavigate } from "react-router-dom";
 import awsConfig from '../awsConfig';
+import { useAuth } from "../pages/AuthContext";
+
 
 const Products = () => {
   const [data, setData] = useState([]);
@@ -14,6 +17,14 @@ const Products = () => {
   const [isFiltered, setIsFiltered] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { authenticated, email } = useAuth();
+
+  const cartState = useSelector(state => state.handleCart);
+
+  const stateOfwish = useSelector(state => state.wishlist);
+  const userWishlist = (stateOfwish.wishlists && stateOfwish.wishlists[email]) || [];
+
+
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -35,12 +46,37 @@ const Products = () => {
         setLoading(false);
       }
     };
-
     fetchProducts();
   }, []);
 
+
+
+
+
   const addProductToCart = (product) => {
     dispatch(addCart(product));
+  };
+
+  const addProductToWishlist = (product) => {
+
+    if (authenticated) {
+      dispatch(addWishlistItem(email, product));
+      alert("Product added to Wishlist")
+    } else {
+      alert("You have to login to use Wishlist");
+      // navigate('/login');
+    }
+  }
+
+  const removeProductFromWishlist = (product) => {
+    if (authenticated) {
+      dispatch(removeWishlistItem(email, product));
+      alert("Product removed from Wishlist")
+    } else {
+      // alert("Please log in to remove items from your wishlist.");
+      alert("You have to login to use Wishlist");
+      // navigate('/login');
+    }
   };
 
   const toggleProductSelection = (product) => {
@@ -104,44 +140,61 @@ const Products = () => {
       )}
 
       <div className="row">
-        {filter.map((product) => (
-          <div key={product.id} className="col-md-4 mb-4">
-            <div className="card text-center">
-              <img
-                className="card-img-top p-3"
-                src={product.image}
-                alt="Card"
-                height={300}
-              />
-              <div className="card-body">
-                <h5 className="card-title">{product.title.substring(0, 12)}...</h5>
-                <p className="card-text">{product.description.substring(0, 90)}...</p>
-              </div>
-              <ul className="list-group list-group-flush">
-                <li className="list-group-item lead">$ {product.price}</li>
-              </ul>
-              <div className="card-body">
-                <Link to={`/product/${product.id}`} className="btn btn-dark m-1">
-                  Details
+        {filter.map((product) => {
+          const isProductInWishlist = userWishlist.find(item => item.id === product.id);
+          return (
+            <div key={product.id} className="col-md-4 mb-4">
+              <div className="card text-center">
+
+                <Link to={`/product/${product.id}`}>
+                  <img
+                    className="card-img-top p-3"
+                    src={product.image}
+                    alt="Card"
+                    height={300}
+                  />
                 </Link>
-                <button className="btn btn-dark m-1" onClick={() => addProductToCart(product)}>
-                  Add to Cart
-                </button>
-                {isFiltered && (
-                  <div className="form-check mt-2">
-                    <input
-                      type="checkbox"
-                      className="form-check-input"
-                      checked={selectedProducts.includes(product)}
-                      onChange={() => toggleProductSelection(product)}
-                    />
-                    <label className="form-check-label">Compare</label>
-                  </div>
-                )}
+                <div className="card-body">
+                  <h5 className="card-title">{product.title.substring(0, 12)}...</h5>
+                  <p className="card-text">{product.description.substring(0, 90)}...</p>
+                </div>
+                <ul className="list-group list-group-flush">
+                  <li className="list-group-item lead">$ {product.price}</li>
+                </ul>
+                <div className="card-body">
+                  <Link to={`/product/${product.id}`} className="btn btn-dark m-1">
+                    Details
+                  </Link>
+                  <button className="btn btn-dark m-1" onClick={() => addProductToCart(product)}>
+                    Add to Cart
+                  </button>
+
+                  <button className="btn btn-dark mx-3" onClick={() => {
+                    if (!isProductInWishlist) {
+                      addProductToWishlist(product);
+                    } else {
+                      removeProductFromWishlist(product);
+                    }
+                  }}>
+                    <i className={`fa${isProductInWishlist ? 's' : 'r'} fa-heart`}></i>
+                  </button>
+
+                  {isFiltered && (
+                    <div className="form-check mt-2">
+                      <input
+                        type="checkbox"
+                        className="form-check-input"
+                        checked={selectedProducts.includes(product)}
+                        onChange={() => toggleProductSelection(product)}
+                      />
+                      <label className="form-check-label">Compare</label>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </>
   );
@@ -162,11 +215,16 @@ const Products = () => {
       <div className="row">
         {loading ? <LoadingSkeleton /> : <FilteredProducts />}
       </div>
-
     </div>
   );
 };
 
 export default Products;
+
+
+
+
+
+
 
 

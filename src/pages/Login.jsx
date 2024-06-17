@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext"; // Adjust the path to AuthContext.js accordingly
-import { Footer } from "../components";
+import { Footer, Navbar } from "../components";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -12,8 +12,11 @@ const Login = () => {
   const navigate = useNavigate();
   const maxRetries = 3; // Set the maximum number of retries
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+    setRetryCount(retryCount + 1);
 
     if (retryCount >= maxRetries) {
       setError("Maximum login attempts exceeded. Please try again later.");
@@ -27,15 +30,25 @@ const Login = () => {
 
     try {
       await login(email, password);
-      navigate("/"); // Redirect to your home page or other desired page.
+
+      if (email) {
+        navigate('/');
+      } else {
+        setError("Login Attempt Failed! try again");
+      }
+
+
+
+      // Redirect to your home page or other desired page.
     } catch (err) {
-      setRetryCount(retryCount + 1);
+      console.error('Cognito authentication error:', error);
       setError(err.message);
     }
   };
 
   return (
     <>
+      <Navbar />
       <div className="container my-3 py-3">
         <h1 className="text-center">Login</h1>
         <hr />
